@@ -21,14 +21,7 @@ export function buildScreeningPayload(canonical: CanonicalFilters): ScreeningReq
     });
   }
 
-  // Country filters
-  if (canonical.countries && canonical.countries.length > 0) {
-    conditions.push({
-      column: 'largest_headcount_country',
-      type: 'in',
-      value: canonical.countries.join(',')
-    });
-  }
+  // Country filters removed - focusing on industry and other metrics only
 
   // Headcount range
   if (canonical.headcountRange) {
@@ -98,59 +91,44 @@ export function buildScreeningPayload(canonical: CanonicalFilters): ScreeningReq
 export function buildCompanySearchPayload(canonical: CanonicalFilters): CompanySearchByFilters {
   const filters: any[] = [];
 
-  // Industry filter (map to valid Crustdata values)
+  // Industry filter - only Software Development supported
   if (canonical.industry && canonical.industry.length > 0) {
-    const industryMapping: { [key: string]: string } = {
-      'AI': 'Software Development',
-      'Fintech': 'Financial Services',
-      'Cybersecurity': 'Software Development',
-      'Healthcare': 'Software Development',
-      'SaaS': 'Software Development',
-      'E-commerce': 'Retail',
-      'EdTech': 'Software Development',
-      'PropTech': 'Real Estate',
-      'CleanTech': 'Software Development',
-      'Software': 'Software Development',
-      'Technology': 'Software Development',
-      'Tech': 'Software Development'
-    };
-    
-    const mappedIndustries = canonical.industry.map(ind => industryMapping[ind] || ind);
     filters.push({
       filter_type: 'INDUSTRY',
       type: 'in',
-      value: mappedIndustries
+      value: ['Software Development']
     });
   }
 
-  // Region/Country filter
-  if (canonical.countries && canonical.countries.length > 0) {
-    filters.push({
-      filter_type: 'REGION',
-      type: 'in',
-      value: canonical.countries
-    });
-  }
-
-  // Headcount filter
-  if (canonical.headcountRange) {
-    const [min, max] = canonical.headcountRange;
-    let headcountValue: string;
-    
-    if (min <= 10) headcountValue = '1-10';
-    else if (min <= 50) headcountValue = '11-50';
-    else if (min <= 200) headcountValue = '51-200';
-    else if (min <= 500) headcountValue = '201-500';
-    else if (min <= 1000) headcountValue = '501-1,000';
-    else if (min <= 5000) headcountValue = '1,001-5,000';
-    else if (min <= 10000) headcountValue = '5,001-10,000';
-    else headcountValue = '10,001+';
-
+  // Headcount filter - use exact Company Search API values
+  if (canonical.headcountRange && Array.isArray(canonical.headcountRange) && typeof canonical.headcountRange[0] === 'string') {
+    // New format: headcountRange is array of strings like ["51-200", "201-500"]
     filters.push({
       filter_type: 'COMPANY_HEADCOUNT',
       type: 'in',
-      value: [headcountValue]
+      value: canonical.headcountRange
     });
+  } else if (canonical.headcountRange && Array.isArray(canonical.headcountRange) && typeof canonical.headcountRange[0] === 'number') {
+    // Legacy format: convert [min, max] to Company Search API format
+    const [min, max] = canonical.headcountRange;
+    let headcountValues: string[] = [];
+    
+    if (min <= 10) headcountValues.push('1-10');
+    if (min <= 50 && max >= 11) headcountValues.push('11-50');
+    if (min <= 200 && max >= 51) headcountValues.push('51-200');
+    if (min <= 500 && max >= 201) headcountValues.push('201-500');
+    if (min <= 1000 && max >= 501) headcountValues.push('501-1,000');
+    if (min <= 5000 && max >= 1001) headcountValues.push('1,001-5,000');
+    if (min <= 10000 && max >= 5001) headcountValues.push('5,001-10,000');
+    if (max >= 10001) headcountValues.push('10,001+');
+
+    if (headcountValues.length > 0) {
+      filters.push({
+        filter_type: 'COMPANY_HEADCOUNT',
+        type: 'in',
+        value: headcountValues
+      });
+    }
   }
 
   return {
@@ -169,37 +147,12 @@ export function buildPersonSearchPayload(canonical: CanonicalFilters): CompanySe
     value: ['Founder', 'Co-Founder', 'CEO', 'CTO', 'VP Engineering', 'Head of Product']
   });
 
-  // Region filter
-  if (canonical.countries && canonical.countries.length > 0) {
-    filters.push({
-      filter_type: 'REGION',
-      type: 'in',
-      value: canonical.countries
-    });
-  }
-
-  // Industry filter (map to valid Crustdata values)
+  // Industry filter - only Software Development supported
   if (canonical.industry && canonical.industry.length > 0) {
-    const industryMapping: { [key: string]: string } = {
-      'AI': 'Software Development',
-      'Fintech': 'Financial Services',
-      'Cybersecurity': 'Software Development',
-      'Healthcare': 'Software Development',
-      'SaaS': 'Software Development',
-      'E-commerce': 'Retail',
-      'EdTech': 'Software Development',
-      'PropTech': 'Real Estate',
-      'CleanTech': 'Software Development',
-      'Software': 'Software Development',
-      'Technology': 'Software Development',
-      'Tech': 'Software Development'
-    };
-    
-    const mappedIndustries = canonical.industry.map(ind => industryMapping[ind] || ind);
     filters.push({
       filter_type: 'INDUSTRY',
       type: 'in',
-      value: mappedIndustries
+      value: ['Software Development']
     });
   }
 

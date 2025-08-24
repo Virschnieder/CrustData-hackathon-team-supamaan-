@@ -22,15 +22,15 @@ async function validateAPIWithRealKeys() {
     
     // Check canonical filters
     console.log('🧠 CANONICAL FILTERS:');
-    console.log(JSON.stringify(data.canonicalFilters, null, 2));
-    console.log(`   Fields: ${Object.keys(data.canonicalFilters).length}`);
+    console.log(JSON.stringify(data.canonical, null, 2));
+    console.log(`   Fields: ${Object.keys(data.canonical || {}).length}`);
     
     // Check screen response
     console.log('\n1️⃣ SCREENER API:');
-    if (data.screenResponse) {
-      console.log(`   ✅ Success - Fields: ${data.screenResponse.fields?.length || 0}, Rows: ${data.screenResponse.rows?.length || 0}`);
-      if (data.screenResponse.rows?.length > 0) {
-        console.log(`   📊 Sample data: ${JSON.stringify(data.screenResponse.rows[0], null, 2)}`);
+    if (data.screenRes) {
+      console.log(`   ✅ Success - Fields: ${data.screenRes.fields?.length || 0}, Rows: ${data.screenRes.rows?.length || 0}`);
+      if (data.screenRes.rows?.length > 0) {
+        console.log(`   📊 Sample data: ${JSON.stringify(data.screenRes.rows[0], null, 2)}`);
       }
     } else {
       console.log('   ❌ Failed or empty response');
@@ -38,8 +38,8 @@ async function validateAPIWithRealKeys() {
     
     // Check company search
     console.log('\n2️⃣ COMPANY SEARCH:');
-    if (data.companySearchResponse) {
-      console.log(`   ✅ Success - Companies: ${data.companySearchResponse.companies?.length || 0}`);
+    if (data.companySearchRes) {
+      console.log(`   ✅ Success - Companies: ${data.companySearchRes.companies?.length || 0}`);
     } else {
       console.log('   ❌ Failed or empty response');
     }
