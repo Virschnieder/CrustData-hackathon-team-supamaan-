@@ -1,0 +1,8 @@
+{
+  "hash": "hash1",
+  "data": {},
+  "ranking": {},
+  "processedAt": "2025-08-24T12:14:27.474Z",
+  "status": "error",
+  "error": "Claude chat failed: Claude API error: 404 Not Found"
+}

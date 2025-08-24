@@ -1,0 +1,24 @@
+{
+  "company_data": {
+    "company_id": 689478,
+    "company_name": "Zip",
+    "linkedin_profile_name": "Zip",
+    "linkedin_profile_url": "https://www.linkedin.com/company/theziphq",
+    "crunchbase_profile_url": "https://crunchbase.com/organization/zip-f492",
+    "crunchbase_profile_uuid": "7910ddf1-058f-49bb-9a25-85eddaaaf492",
+    "linkedin_id": "42784537",
+    "linkedin_logo_url": "https://media.licdn.com/dms/image/v2/D560BAQFooZzagVObmA/company-logo_200_200/company-logo_200_200/0/1727235279436/theziphq_logo?e=1753920000&v=beta&t=BzGf2_8BQg6tR4mdO5wXf3If53s4q4-kF9gnF0Cy2kI",
+    "linkedin_logo_permalink": "https://crustdata-media.s3.us-east-2.amazonaws.com/company/a626a10e3cc8adac4673a989fc31cea3087dea3132e3fb546e4db73cc8cd5c63.jpg",
+    "company_twitter_url": "https://www.twitter.com/theziphq",
+    "company_website_domain": "ziphq.com",
+    "hq_country": "USA",
+    "headquarters": "San Francisco, California, United States",
+    "largest_headcount_country": "USA",
+    "hq_street_address": "1 Sansome St. Ste 3000,San Francisco",
+    "company_website": "https://www.ziphq.com",
+    "year_founded": "2020-01-01",
+    "fiscal_year_end": null
+  },
+  "employees_data": [],
+  "external_links": ["https://www.twitter.com/theziphq"]
+}

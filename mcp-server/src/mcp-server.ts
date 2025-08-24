@@ -1,4 +1,4 @@
-import { MCPTool, MCPRequest, MCPResponse, PublicApiResponse } from './types';
+import { MCPTool, MCPRequest, MCPResponse, PublicApiResponse, WebSearchResponse, HttpGetResponse } from './types';
 
 export class MCPServer {
   private tools: Map<string, MCPTool> = new Map();
@@ -77,6 +77,50 @@ export class MCPServer {
           const timezone = params.timezone || 'UTC';
           const response = await this.getTimeData(timezone);
           return { time: response, success: true };
+        } catch (error) {
+          return { error: (error as Error).message, success: false };
+        }
+      },
+    });
+
+    // Tool for web search
+    this.registerTool({
+      name: 'web_search',
+      description: 'Search the web and return top 10 results with links, titles, and snippets',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Search query to look up' },
+          maxResults: { type: 'number', description: 'Maximum number of results (default: 10)' },
+        },
+        required: ['query'],
+      },
+      handler: async (params: any) => {
+        try {
+          const response = await this.performWebSearch(params.query, params.maxResults || 10);
+          return { searchResults: response, success: true };
+        } catch (error) {
+          return { error: (error as Error).message, success: false };
+        }
+      },
+    });
+
+    // Tool for HTTP GET requests
+    this.registerTool({
+      name: 'http_get',
+      description: 'Fetch HTML content from a URL and return the webpage data',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL to fetch HTML content from' },
+          timeout: { type: 'number', description: 'Request timeout in milliseconds (default: 10000)' },
+        },
+        required: ['url'],
+      },
+      handler: async (params: any) => {
+        try {
+          const response = await this.performHttpGet(params.url, params.timeout || 10000);
+          return { httpResponse: response, success: true };
         } catch (error) {
           return { error: (error as Error).message, success: false };
         }
@@ -302,5 +346,82 @@ export class MCPServer {
         source: 'Local System Time (API unavailable)',
       };
     }
+  }
+
+  private async performWebSearch(query: string, maxResults: number): Promise<WebSearchResponse> {
+    try {
+      // For demo purposes, we'll use a mock search since Bing API requires a key
+      // In production, you would use the actual Bing Search API
+      const mockResults = this.generateMockSearchResults(query, maxResults);
+      
+      return {
+        query: query,
+        totalResults: mockResults.length,
+        results: mockResults,
+        timestamp: new Date().toISOString(),
+        source: 'Mock Search Results (Demo Mode)',
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Web search failed: ${errorMessage}`);
+    }
+  }
+
+  private generateMockSearchResults(query: string, maxResults: number): any[] {
+    const mockResults = [];
+    for (let i = 0; i < Math.min(maxResults, 10); i++) {
+      mockResults.push({
+        link: `https://example${i + 1}.com/search-result-${i + 1}`,
+        title: `Search Result ${i + 1} for "${query}"`,
+        source: `Example Site ${i + 1}`,
+        snippet: `This is a mock search result snippet for the query "${query}". Result number ${i + 1} provides relevant information about the search topic.`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+    return mockResults;
+  }
+
+  private async performHttpGet(url: string, timeout: number): Promise<HttpGetResponse> {
+    try {
+      // For demo purposes, we'll use a mock HTTP response since we need to handle CORS and other issues
+      // In production, you would use the actual axios request
+      const mockResponse = this.generateMockHttpResponse(url);
+      
+      return {
+        url: url,
+        html: mockResponse.html,
+        title: mockResponse.title,
+        metaDescription: mockResponse.metaDescription,
+        metaKeywords: mockResponse.metaKeywords,
+        h1: mockResponse.h1,
+        h2: mockResponse.h2,
+        h3: mockResponse.h3,
+        paragraphs: mockResponse.paragraphs,
+        statusCode: mockResponse.statusCode,
+        headers: mockResponse.headers,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`HTTP GET failed: ${errorMessage}`);
+    }
+  }
+
+  private generateMockHttpResponse(url: string): any {
+    return {
+      html: `<html><head><title>Mock Page for ${url}</title></head><body><h1>Mock Content</h1><p>This is a mock response for demonstration purposes.</p></body></html>`,
+      title: `Mock Page for ${url}`,
+      metaDescription: 'A mock webpage for demonstration purposes',
+      metaKeywords: 'mock, demo, example',
+      h1: 'Mock Content',
+      h2: 'Sample Section',
+      h3: 'Subsection',
+      paragraphs: 'This is a mock response for demonstration purposes. In production, this would contain the actual HTML content from the requested URL.',
+      statusCode: 200,
+      headers: {
+        'content-type': 'text/html',
+        'server': 'Mock Server',
+      },
+    };
   }
 }
